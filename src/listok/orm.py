@@ -63,46 +63,42 @@ class Model(_Table):
             ]
             sql += f',{','.join(columns)}'
         sql += ');'
-        with conn:
-            conn.execute(sql)
+        conn.execute(sql)
 
     def save(self, conn: Connection) -> None:
         fields = dataclasses.fields(self)
         key = fields[0]
         if len(fields) == 1:
-            with conn:
-                conn.execute(
-                    f""" INSERT OR IGNORE INTO {self.__class__}
+            conn.execute(
+                f""" INSERT OR IGNORE INTO {self.__class__}
                          VALUES (:{key.name});
                     """,
-                    self.__dict__,
-                )
+                self.__dict__,
+            )
         else:
             con_name_list = ', '.join(field.name for field in fields[1:])
             param_list = ', '.join(f':{field.name}' for field in fields[1:])
             # TODO: if key is None insert without key
-            with conn:
-                res = conn.execute(
-                    f""" INSERT INTO {self.__class__}
-                             ({key.name}, {con_name_list})
-                         VALUES (:{key.name}, {param_list})
-                         ON CONFLICT ({key.name})
-                         DO UPDATE SET ({con_name_list}) = ({param_list})
-                         RETURNING {key.name};
-                    """,
-                    self.__dict__,
-                ).fetchone()[0]
+            res = conn.execute(
+                f""" INSERT INTO {self.__class__}
+                         ({key.name}, {con_name_list})
+                     VALUES (:{key.name}, {param_list})
+                     ON CONFLICT ({key.name})
+                     DO UPDATE SET ({con_name_list}) = ({param_list})
+                     RETURNING {key.name};
+                """,
+                self.__dict__,
+            ).fetchone()[0]
             setattr(self, key.name, res)
 
     def delete(self, conn: Connection) -> None:
         fields = dataclasses.fields(self)
         key = fields[0]
-        with conn:
-            conn.execute(
-                f""" DELETE FROM {self.__class__} WHERE {key.name} = ?;
-                """,
-                (getattr(self, key.name),),
-            )
+        conn.execute(
+            f""" DELETE FROM {self.__class__} WHERE {key.name} = ?;
+            """,
+            (getattr(self, key.name),),
+        )
 
 
 class Junction(_Table):
@@ -125,36 +121,34 @@ class Junction(_Table):
         key_first = dataclasses.fields(TableFirst)[0]
         key_second = dataclasses.fields(TableSecond)[0]
 
-        with conn:
-            conn.execute(
-                f""" CREATE TABLE {cls}(
-                     {field_first.name}
-                         {type_to_sqlite_type[key_first.type]},
-                     {field_second.name}
-                         {type_to_sqlite_type[key_second.type]},
-                     UNIQUE({field_first.name}, {field_second.name}),
-                     FOREIGN KEY({field_first.name})
-                         REFERENCES {TableFirst}({key_first.name})
-                         ON DELETE CASCADE,
-                     FOREIGN KEY({field_second.name})
-                         REFERENCES {TableSecond}({key_second.name})
-                         ON DELETE CASCADE
-                );
-                """
-            )
+        conn.execute(
+            f""" CREATE TABLE {cls}(
+                 {field_first.name}
+                     {type_to_sqlite_type[key_first.type]},
+                 {field_second.name}
+                     {type_to_sqlite_type[key_second.type]},
+                 UNIQUE({field_first.name}, {field_second.name}),
+                 FOREIGN KEY({field_first.name})
+                     REFERENCES {TableFirst}({key_first.name})
+                     ON DELETE CASCADE,
+                 FOREIGN KEY({field_second.name})
+                     REFERENCES {TableSecond}({key_second.name})
+                     ON DELETE CASCADE
+            );
+            """
+        )
 
     def save(self, conn: Connection) -> None:
         fields = dataclasses.fields(self)
         field_first = fields[0]
         field_second = fields[1]
-        with conn:
-            conn.execute(
-                f""" INSERT OR IGNORE INTO {self.__class__}
-                        ({field_first.name}, {field_second.name})
-                     VALUES (:{field_first.name}, :{field_second.name});
-                """,
-                self.__dict__,
-            )
+        conn.execute(
+            f""" INSERT OR IGNORE INTO {self.__class__}
+                    ({field_first.name}, {field_second.name})
+                 VALUES (:{field_first.name}, :{field_second.name});
+            """,
+            self.__dict__,
+        )
 
 
 type StrPath = str | os.PathLike[str]
@@ -177,3 +171,4 @@ def create_connection(db_path: StrPath) -> Connection:
 def init_tables(conn: Connection) -> None:
     for table in Model.__subclasses__() + Junction.__subclasses__():
         table.__init_table__(conn)
+    conn.commit()
