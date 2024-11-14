@@ -94,6 +94,16 @@ class Model(_Table):
                 ).fetchone()[0]
             setattr(self, key.name, res)
 
+    def delete(self, conn: Connection) -> None:
+        fields = dataclasses.fields(self)
+        key = fields[0]
+        with conn:
+            conn.execute(
+                f""" DELETE FROM {self.__class__} WHERE {key.name} = ?;
+                """,
+                (getattr(self, key.name),),
+            )
+
 
 class Junction(_Table):
     @classmethod
