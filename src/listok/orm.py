@@ -65,31 +65,33 @@ class Model(_Table):
         sql += ');'
         conn.execute(sql)
 
-    def save(self, conn: Connection) -> Self:
+    def save(self, conn: Connection, update_if_exists: bool = True) -> Self:
         fields = dataclasses.fields(self)
         key = fields[0]
-        if len(fields) == 1:
+        cols_no_key = ', '.join(field.name for field in fields[1:])
+        params_no_key = ', '.join(f':{field.name}' for field in fields[1:])
+
+        cols = ', '.join(field.name for field in fields)
+        params = ', '.join(f':{field.name}' for field in fields)
+
+        if len(fields) == 1 or not update_if_exists:
             conn.execute(
                 f""" INSERT OR IGNORE INTO {self.__class__}
-                         VALUES (:{key.name});
+                         ({cols})
+                     VALUES ({params});
                     """,
                 self.__dict__,
             )
         else:
-            con_name_list = ', '.join(field.name for field in fields[1:])
-            param_list = ', '.join(f':{field.name}' for field in fields[1:])
-            # TODO: if key is None insert without key
-            res = conn.execute(
+            conn.execute(
                 f""" INSERT INTO {self.__class__}
-                         ({key.name}, {con_name_list})
-                     VALUES (:{key.name}, {param_list})
+                         ({cols})
+                     VALUES ({params})
                      ON CONFLICT ({key.name})
-                     DO UPDATE SET ({con_name_list}) = ({param_list})
-                     RETURNING {key.name};
+                     DO UPDATE SET ({cols_no_key}) = ({params_no_key});
                 """,
                 self.__dict__,
-            ).fetchone()[0]
-            setattr(self, key.name, res)
+            )
         return self
 
     def delete(self, conn: Connection) -> None:
