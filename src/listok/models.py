@@ -38,6 +38,11 @@ class Note(Model):
         ).fetchone()
         return cls(**res) if res else None
 
+    @property
+    def short_id(self) -> str:
+        # emulating git short ids
+        return self.note_id[:8]
+
     @classmethod
     def by_tags(
         cls,
