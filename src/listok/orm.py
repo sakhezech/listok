@@ -5,7 +5,7 @@ import sqlite3
 import typing
 from sqlite3 import Connection
 from types import NoneType
-from typing import Annotated, Any, ClassVar, TypeGuard
+from typing import Annotated, Any, ClassVar, Self, TypeGuard
 
 type_to_sqlite_type: dict[Any, str] = {
     NoneType: 'NULL',
@@ -65,7 +65,7 @@ class Model(_Table):
         sql += ');'
         conn.execute(sql)
 
-    def save(self, conn: Connection) -> None:
+    def save(self, conn: Connection) -> Self:
         fields = dataclasses.fields(self)
         key = fields[0]
         if len(fields) == 1:
@@ -90,6 +90,7 @@ class Model(_Table):
                 self.__dict__,
             ).fetchone()[0]
             setattr(self, key.name, res)
+        return self
 
     def delete(self, conn: Connection) -> None:
         fields = dataclasses.fields(self)
@@ -138,7 +139,7 @@ class Junction(_Table):
             """
         )
 
-    def save(self, conn: Connection) -> None:
+    def save(self, conn: Connection) -> Self:
         fields = dataclasses.fields(self)
         field_first = fields[0]
         field_second = fields[1]
@@ -149,6 +150,7 @@ class Junction(_Table):
             """,
             self.__dict__,
         )
+        return self
 
 
 type StrPath = str | os.PathLike[str]
