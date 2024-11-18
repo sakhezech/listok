@@ -1,6 +1,7 @@
 import dataclasses
 import datetime
 import os
+from collections.abc import Iterable
 from sqlite3 import Connection
 from typing import Annotated, Self
 
@@ -70,6 +71,13 @@ class Note(Model):
         ).fetchall()
         return [cls(**row) for row in res]
 
+    def add_tags(self, conn: Connection, tag_ids: Iterable[str]) -> None:
+        for tag_id in tag_ids:
+            Tag(tag_id=tag_id, description='').save(
+                conn, update_if_exists=False
+            )
+            NoteTag(note_id=self.note_id, tag_id=tag_id).save(conn)
+
 
 class Tag(Model):
     tag_id: str
@@ -83,6 +91,14 @@ class Tag(Model):
             (tag_id,),
         ).fetchone()
         return cls(**res) if res else None
+
+    @classmethod
+    def all(cls, conn: Connection) -> list[Self]:
+        res = conn.execute(
+            f""" SELECT * FROM {Tag};
+            """
+        ).fetchall()
+        return [cls(**row) for row in res]
 
 
 class NoteTag(Junction):
