@@ -78,6 +78,27 @@ class Note(Model):
             )
             NoteTag(note_id=self.note_id, tag_id=tag_id).save(conn)
 
+    def remove_tags(self, conn: Connection) -> None:
+        conn.execute(
+            f""" DELETE FROM {NoteTag} WHERE {NoteTag.note_id} = ?;
+            """,
+            (self.note_id,),
+        )
+
+    def update_tags(self, conn: Connection, tag_ids: Iterable[str]) -> None:
+        self.remove_tags(conn)
+        self.add_tags(conn, tag_ids)
+
+    def get_tags(self, conn: Connection) -> list['Tag']:
+        res = conn.execute(
+            f""" SELECT {Tag}.* FROM {NoteTag}
+                 JOIN {Tag} ON {Tag.tag_id} = {NoteTag.tag_id}
+                    WHERE {NoteTag.note_id} = ?;
+            """,
+            (self.note_id,),
+        ).fetchall()
+        return [Tag(**row) for row in res]
+
 
 class Tag(Model):
     tag_id: str
