@@ -102,9 +102,9 @@ def cli(argv: Sequence[str] | None = None) -> None:
     add_parser.add_argument('-m')
     add_parser.add_argument('tags', nargs='*')
 
-    update_parser = subparsers.add_parser('edit')
-    update_parser.set_defaults(func=edit_func)
-    update_parser.add_argument('id')
+    edit_parser = subparsers.add_parser('edit')
+    edit_parser.set_defaults(func=edit_func)
+    edit_parser.add_argument('id')
 
     list_parser = subparsers.add_parser('list')
     list_parser.set_defaults(func=list_func)
