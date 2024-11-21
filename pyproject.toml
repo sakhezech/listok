@@ -3,7 +3,7 @@ name = 'listok'
 readme = 'README.md'
 description = 'quick note-taking terminal app'
 license = 'MIT'
-dependencies = []
+dependencies = ['platformdirs']
 dynamic = ['version']
 
 [project.scripts]
