@@ -4,6 +4,8 @@ from collections.abc import Iterable, Sequence
 from pathlib import Path
 from sqlite3 import Connection
 
+import platformdirs
+
 from .input import editor_input
 from .models import Note, Tag
 from .orm import create_connection
@@ -112,12 +114,12 @@ def cli(argv: Sequence[str] | None = None) -> None:
     list_parser.add_argument('-n', '--not', nargs='*', dest='not_')
 
     # ---
-    # HACK: hack db path until finalize where exactly to put the db
-    # probably platformdirs
-    DB_PATH = 'hardcoded_db_path.sqlite3'
+    listok_dirs = platformdirs.PlatformDirs('listok')
+    listok_dirs.user_data_path.mkdir(parents=True, exist_ok=True)
+    db_path = listok_dirs.user_data_path / 'listki.sqlite3'
 
     args = parser.parse_args(argv)
-    conn = create_connection(DB_PATH)
+    conn = create_connection(db_path)
     args.func(**args.__dict__, conn=conn)
 
 
