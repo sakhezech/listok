@@ -6,6 +6,10 @@ license = 'MIT'
 dependencies = []
 dynamic = ['version']
 
+[project.scripts]
+listok = 'listok.__main__:cli'
+note = 'listok.__main__:cli'
+
 [project.optional-dependencies]
 dev = ['ruff']
 
