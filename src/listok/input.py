@@ -2,19 +2,21 @@ import os
 import subprocess
 import tempfile
 import textwrap
+from collections.abc import Sequence
 from pathlib import Path
 
 _COMMENT_STR = '#'
 
 
-# TODO: add ability to pass in arguments for the editor
 def editor_input(
     data: str = '',
     comment: str = '',
     filename: str = 'DEFAULT_FILENAME',
-    editor: str | None = None,
+    editor: Sequence[str] | None = None,
 ) -> str:
-    editor = editor or os.getenv('EDITOR') or os.getenv('VISUAL') or 'vi'
+    if not editor:
+        editor_str = os.getenv('EDITOR') or os.getenv('VISUAL') or 'vi'
+        editor = [editor_str]
     comment = textwrap.dedent(comment)
     comment = '\n'.join(
         textwrap.wrap(
@@ -31,7 +33,7 @@ def editor_input(
         file_path = Path(tempdir_path) / filename
         file_path.write_text(f'{data}\n{comment}')
 
-        subprocess.run([editor, str(file_path)])
+        subprocess.run([*editor, '--', str(file_path)])
 
         with file_path.open('r') as f:
             lines = f.readlines()
