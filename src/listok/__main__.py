@@ -3,6 +3,7 @@ import textwrap
 from collections.abc import Iterable, Sequence
 from pathlib import Path
 from sqlite3 import Connection
+from typing import NoReturn
 
 import platformdirs
 
@@ -11,6 +12,13 @@ from .models import Note, Tag
 from .orm import create_connection
 
 _SPLIT = '\n\n'
+
+
+def print_and_exit(*message: str, exit_code: int = 1) -> NoReturn:
+    import sys
+
+    print(*message, file=sys.stderr)
+    exit(exit_code)
 
 
 def make_tag_set(tags: Iterable[str]) -> set[str]:
@@ -50,7 +58,12 @@ def add_func(tags: list[str], m: str | None, conn: Connection, **_) -> None:
             comment=comment,
             filename='ADD_NOTE',
         )
-        head, body, tags_ = str_to_note_components(res)
+        if not res:
+            print_and_exit('empty message, aborted')
+        try:
+            head, body, tags_ = str_to_note_components(res)
+        except ValueError:
+            print_and_exit('empty message, aborted')
 
     note = Note(head=head, body=body).save(conn)
     note.add_tags(conn, tags_)
@@ -61,7 +74,7 @@ def add_func(tags: list[str], m: str | None, conn: Connection, **_) -> None:
 def edit_func(id: str, conn: Connection, **_) -> None:
     note = Note.by_partial_id(conn, id)
     if not note:
-        raise ValueError(f'no notes found: {id}')
+        print_and_exit(f'no notes found: {id}')
 
     tags = [tag.tag_id for tag in note.get_tags(conn)]
     res = editor_input(
@@ -72,7 +85,10 @@ def edit_func(id: str, conn: Connection, **_) -> None:
         """,
         filename='EDIT_NOTE',
     )
-    note.head, note.body, tags = str_to_note_components(res)
+    try:
+        note.head, note.body, tags = str_to_note_components(res)
+    except ValueError:
+        print_and_exit('empty message, aborted')
     note.save(conn)
     note.update_tags(conn, tags)
     conn.commit()
