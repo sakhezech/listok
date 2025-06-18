@@ -50,7 +50,11 @@ def cli(argv: Sequence[str] | None = None) -> None:
     args = parser.parse_args(argv)
 
     key_function = make_sort_key_function(config.weights)
-    if args.above in config.weights:
+    if args.above is None:
+        import math
+
+        args.above = -(math.inf)
+    elif args.above in config.weights:
         args.above = config.weights[args.above]
     else:
         raise ValueError(f'no such level: {args.above}')
