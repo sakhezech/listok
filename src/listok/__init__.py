@@ -25,10 +25,12 @@ def get_todos(config: Config) -> dict[str, dict[str, str]]:
         lines = file.read_text().splitlines()
 
         for line in lines:
-            if line.startswith('##'):
+            if line.startswith('- [ ]'):
                 curr_todo = []
-                title = line.removeprefix('##').strip()
+                title = line.removeprefix('- [ ]').strip()
                 project_todos[title] = curr_todo
+            elif line.startswith('- [x]'):
+                curr_todo = None
             elif curr_todo is not None:
                 curr_todo.append(line)
 
