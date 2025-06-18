@@ -32,7 +32,7 @@ def make_parser() -> argparse.ArgumentParser:
 def make_sort_key_function(weights: dict[str, int]) -> Callable[[str], int]:
     def key_function(string: str) -> int:
         for kw, weight in weights.items():
-            if kw in string:
+            if kw.lower() in string.lower():
                 return weight
         return 0
 
@@ -73,7 +73,8 @@ def cli(argv: Sequence[str] | None = None) -> None:
         filtered_todos = {
             k: v
             for k, v in todos.items()
-            if args.filter in k and key_function(k) >= args.above
+            if args.filter.lower() in k.lower()
+            and key_function(k) >= args.above
         }
         if filtered_todos:
             print(project_name)
