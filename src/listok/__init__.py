@@ -6,6 +6,7 @@ from pathlib import Path
 class Config:
     projects_dir: str = '~/Projects/'
     file_name: str = 'TODO.md'
+    weights: dict[str, int] = dataclasses.field(default_factory=dict)
 
 
 def get_todos(config: Config) -> dict[str, dict[str, str]]:
