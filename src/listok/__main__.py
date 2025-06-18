@@ -22,6 +22,10 @@ def make_parser() -> argparse.ArgumentParser:
         '--filter',
         default='',
     )
+    parser.add_argument(
+        '-^',
+        '--above',
+    )
     return parser
 
 
@@ -45,14 +49,24 @@ def cli(argv: Sequence[str] | None = None) -> None:
     parser = make_parser()
     args = parser.parse_args(argv)
 
+    key_function = make_sort_key_function(config.weights)
+    if args.above in config.weights:
+        args.above = config.weights[args.above]
+    else:
+        raise ValueError(f'no such level: {args.above}')
+
     collected = get_todos(config)
     for project_name, todos in collected.items():
-        filtered_todos = {k: v for k, v in todos.items() if args.filter in k}
+        filtered_todos = {
+            k: v
+            for k, v in todos.items()
+            if args.filter in k and key_function(k) >= args.above
+        }
         if filtered_todos:
             print(project_name)
             todo_names = list(filtered_todos.keys())
             todo_names.sort(
-                key=make_sort_key_function(config.weights),
+                key=key_function,
                 reverse=True,
             )
             for todo_name in todo_names:
