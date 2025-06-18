@@ -39,6 +39,13 @@ def make_sort_key_function(weights: dict[str, int]) -> Callable[[str], int]:
     return key_function
 
 
+def to_int(value: str) -> int | None:
+    try:
+        return int(value)
+    except ValueError:
+        return None
+
+
 def cli(argv: Sequence[str] | None = None) -> None:
     config_path = Path('~/.config/listok/config.toml').expanduser()
     if not config_path.exists():
@@ -56,6 +63,8 @@ def cli(argv: Sequence[str] | None = None) -> None:
         args.above = -(math.inf)
     elif args.above in config.weights:
         args.above = config.weights[args.above]
+    elif (val := to_int(args.above)) is not None:
+        args.above = val
     else:
         raise ValueError(f'no such level: {args.above}')
 
