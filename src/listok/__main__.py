@@ -62,9 +62,7 @@ def cli(argv: Sequence[str] | None = None) -> None:
 
     key_function = make_sort_key_function(config.weights)
     if args.above is None:
-        import math
-
-        args.above = -(math.inf)
+        args.above = 0
     elif args.above in config.weights:
         args.above = config.weights[args.above]
     elif (val := to_int(args.above)) is not None:
