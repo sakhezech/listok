@@ -30,8 +30,12 @@ def make_parser() -> argparse.ArgumentParser:
 
 
 def make_sort_key_function(weights: dict[str, int]) -> Callable[[str], int]:
+    sorted_weights = dict(
+        sorted(weights.items(), key=lambda x: x[1], reverse=True)
+    )
+
     def key_function(string: str) -> int:
-        for kw, weight in weights.items():
+        for kw, weight in sorted_weights.items():
             if kw.lower() in string.lower():
                 return weight
         return 0
