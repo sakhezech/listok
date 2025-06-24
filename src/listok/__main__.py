@@ -10,7 +10,9 @@ from .__version__ import __version__
 
 
 def make_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description='interproject note consolidator'
+    )
     parser.add_argument(
         '-v',
         '--version',
@@ -21,10 +23,14 @@ def make_parser() -> argparse.ArgumentParser:
         '-f',
         '--filter',
         default='',
+        metavar='SUBSTRING',
+        help='filter for notes with substring',
     )
     parser.add_argument(
         '-^',
         '--above',
+        metavar='LEVEL',
+        help='filter for notes with priority level equal or above',
     )
     return parser
 
