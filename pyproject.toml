@@ -1,7 +1,7 @@
 [project]
 name = 'listok'
 readme = 'README.md'
-description = 'interproject todo consolidator'
+description = 'interproject note consolidator'
 license = 'MIT'
 dynamic = ['version']
 

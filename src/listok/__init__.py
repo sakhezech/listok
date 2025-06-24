@@ -5,11 +5,11 @@ from pathlib import Path
 @dataclasses.dataclass
 class Config:
     projects_dir: str = '~/Projects/'
-    file_name: str = 'TODO.md'
+    file_name: str = 'NOTES.md'
     weights: dict[str, int] = dataclasses.field(default_factory=dict)
 
 
-def get_todos(config: Config) -> dict[str, dict[str, str]]:
+def get_notes(config: Config) -> dict[str, dict[str, str]]:
     collected: dict[str, dict[str, str]] = {}
     for project_dir in Path(config.projects_dir).expanduser().iterdir():
         if not project_dir.is_dir():
@@ -19,22 +19,22 @@ def get_todos(config: Config) -> dict[str, dict[str, str]]:
             continue
 
         project_name = project_dir.name
-        project_todos: dict[str, list[str]] = {}
-        curr_todo: list[str] | None = None
+        project_notes: dict[str, list[str]] = {}
+        curr_note: list[str] | None = None
 
         lines = file.read_text().splitlines()
 
         for line in lines:
             if line.startswith('- [ ]'):
-                curr_todo = []
+                curr_note = []
                 title = line.removeprefix('- [ ]').strip()
-                project_todos[title] = curr_todo
+                project_notes[title] = curr_note
             elif line.startswith('- [x]'):
-                curr_todo = None
-            elif curr_todo is not None:
-                curr_todo.append(line)
+                curr_note = None
+            elif curr_note is not None:
+                curr_note.append(line)
 
         collected[project_name] = {
-            k: '\n'.join(v).strip() for k, v in project_todos.items()
+            k: '\n'.join(v).strip() for k, v in project_notes.items()
         }
     return collected

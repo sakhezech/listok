@@ -1,24 +1,25 @@
 # Listok
 
-Interproject info consolidator.
+Interproject note consolidator.
 
 ## Why?
 
 There are too many projects to keep track of, sometimes I forget some exist.
-If I consolidate all project ideas and TODOs in one place, I will stop forgetting about them.
+If I consolidate all project notes in one place, I will stop forgetting about them.
 
 ## How?
 
-Listok iterates through your projects (by default directories in `~/Projects/`) and searches for the TODO file (by default `TODO.md`).
-It then extracts markdown tasks as todos.
+Listok iterates through your projects (by default directories in `~/Projects/`) and searches for the note file (by default `NOTES.md`).
+It then extracts markdown tasks as notes.
 
 ```markdown
-# TODOs
+# NOTES
 
 Only the tasks matter, you can put here whatever you want.
 
 - [x] add README (complete, will be skipped)
-      hello world, hello world
+      you can put your note body here
+      also they can be multiline
 - [ ] add CI (incomplete, will be shown)
       just check code formatting for now, add test check later
 - [ ] add tests (incomplete, will be shown)
@@ -39,8 +40,8 @@ options:
   -^, --above ABOVE
 ```
 
-- `--filter` will filter for todos with the provided substring.
-- `--above` will filter for todos with the priority level equal or above the provided.
+- `--filter` will filter for notes with the provided substring.
+- `--above` will filter for notes with the priority level equal or above the provided.
 
 Priority levels (`weights` in configuration) are a mapping of substrings to integers.
 If the substring is in the name of the task, then the task gets that priority level.
@@ -50,8 +51,8 @@ If the substring is in the name of the task, then the task gets that priority le
 The configuration file is at `~/.config/listok/config.toml`.
 
 ```toml
-file_name = 'TODO.md' # default: 'TODO.md'
-projects_dir = '~/Projects/' # default: '~/Projects/'
+file_name = 'TODO.md' # default: 'NOTES.md'
+projects_dir = '~/Work/' # default: '~/Projects/'
 
 [weights] # default: {}
 critical = 100

@@ -5,7 +5,7 @@ from typing import Sequence
 
 import tomllib
 
-from . import Config, get_todos
+from . import Config, get_notes
 from .__version__ import __version__
 
 
@@ -70,23 +70,23 @@ def cli(argv: Sequence[str] | None = None) -> None:
     else:
         raise ValueError(f'no such level: {args.above}')
 
-    collected = get_todos(config)
-    for project_name, todos in collected.items():
-        filtered_todos = {
+    collected = get_notes(config)
+    for project_name, notes in collected.items():
+        filtered_notes = {
             k: v
-            for k, v in todos.items()
+            for k, v in notes.items()
             if args.filter.lower() in k.lower()
             and key_function(k) >= args.above
         }
-        if filtered_todos:
+        if filtered_notes:
             print(project_name)
-            todo_names = list(filtered_todos.keys())
-            todo_names.sort(
+            note_names = list(filtered_notes.keys())
+            note_names.sort(
                 key=key_function,
                 reverse=True,
             )
-            for todo_name in todo_names:
-                print(f'    {todo_name}')
+            for note_name in note_names:
+                print(f'    {note_name}')
 
 
 if __name__ == '__main__':
