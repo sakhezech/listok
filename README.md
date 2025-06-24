@@ -53,6 +53,7 @@ The configuration file is at `~/.config/listok/config.toml`.
 ```toml
 file_name = 'TODO.md' # default: 'NOTES.md'
 projects_dir = '~/Work/' # default: '~/Projects/'
+default_weight = 'high' # either priority level or int, default: 0
 
 [weights] # default: {}
 critical = 100

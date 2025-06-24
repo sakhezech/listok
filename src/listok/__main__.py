@@ -1,7 +1,7 @@
 import argparse
 from collections.abc import Callable
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 import tomllib
 
@@ -49,7 +49,7 @@ def make_sort_key_function(weights: dict[str, int]) -> Callable[[str], int]:
     return key_function
 
 
-def to_int(value: str) -> int | None:
+def to_int(value: Any) -> int | None:
     try:
         return int(value)
     except ValueError:
@@ -68,8 +68,8 @@ def cli(argv: Sequence[str] | None = None) -> None:
 
     key_function = make_sort_key_function(config.weights)
     if args.above is None:
-        args.above = 0
-    elif args.above in config.weights:
+        args.above = config.default_weight
+    if args.above in config.weights:
         args.above = config.weights[args.above]
     elif (val := to_int(args.above)) is not None:
         args.above = val

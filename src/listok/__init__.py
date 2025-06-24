@@ -6,6 +6,7 @@ from pathlib import Path
 class Config:
     projects_dir: str = '~/Projects/'
     file_name: str = 'NOTES.md'
+    default_weight: int | str = 0
     weights: dict[str, int] = dataclasses.field(default_factory=dict)
 
 
