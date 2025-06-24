@@ -31,17 +31,17 @@ Only the tasks matter, you can put here whatever you want.
 
 ```console
 $ listok -h
-usage: listok [-h] [-v] [-f FILTER] [-^ ABOVE]
+usage: listok [-h] [-v] [-f SUBSTRING] [-^ LEVEL]
+
+interproject note consolidator
 
 options:
-  -h, --help           show this help message and exit
-  -v, --version        show program's version number and exit
-  -f, --filter FILTER
-  -^, --above ABOVE
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+  -f, --filter SUBSTRING
+                        filter for notes with substring
+  -^, --above LEVEL     filter for notes with priority level equal or above
 ```
-
-- `--filter` will filter for notes with the provided substring.
-- `--above` will filter for notes with the priority level equal or above the provided.
 
 Priority levels (`weights` in configuration) are a mapping of substrings to integers.
 If the substring is in the name of the task, then the task gets that priority level.
