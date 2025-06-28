@@ -30,7 +30,7 @@ def get_notes(config: Config) -> dict[str, dict[str, str]]:
                 curr_note = []
                 title = line.removeprefix('- [ ]').strip()
                 project_notes[title] = curr_note
-            elif line.startswith('- [x]'):
+            elif line.startswith('- [x]') or line.isspace() or not line:
                 curr_note = None
             elif curr_note is not None:
                 curr_note.append(line)
