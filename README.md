@@ -41,6 +41,16 @@ options:
   -f, --filter SUBSTRING
                         filter for notes with substring
   -^, --above LEVEL     filter for notes with priority level equal or above
+
+$ listok -^ 0
+faterunner
+    [CRITICAL] do this
+    [CRITICAL] do that
+    [HIGH] also this
+hashime
+    [MEDIUM] add more tests
+    [MEDIUM] hello
+    [LOW] world
 ```
 
 Priority levels (`weights` in configuration) are a mapping of substrings to integers.
